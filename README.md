@@ -18,6 +18,9 @@ This makes it much easier to understand how the third-party application interact
 ## How to use
 1. Open the third-party application and go to the point where you want to start tracking (eg: before clicking on the SAVE button of a record).
 2. On Freezer, click the **Freeze** button.
+
+![Freezer launch screen](https://i.imgur.com/9VfVvHe.png)
+
 3. Do some insert operations in the third-party application (eg: clicking in the SAVE button).
 4. On Freezer, click the **What is New** button.
 
