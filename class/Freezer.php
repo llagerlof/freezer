@@ -5,10 +5,10 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.9.0
+ * @version    0.9.1
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
- * @link       http://github.com/llagerlof/Freezer
+ * @link       http://github.com/llagerlof/freezer
  * @license    https://opensource.org/licenses/MIT MIT
  */
 class Freezer
