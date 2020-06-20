@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.9.1
+ * @version    0.9.2
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -209,12 +209,11 @@ class Freezer
     public function save()
     {
         $this->getTables();
+        $table_last_ids = array();
         foreach ($this->tables as $tablename => $tabledetail) {
             $last_record_id = $this->getLastRecordId($tablename);
-            if ($last_record_id) {
-                $this->tables[$tablename]['last_record_id'] = $last_record_id;
-                $table_last_ids[$tablename] = $last_record_id;
-            }
+            $this->tables[$tablename]['last_record_id'] = $last_record_id;
+            $table_last_ids[$tablename] = $last_record_id;
         }
 
         return file_put_contents($this->temp_file, serialize($table_last_ids));
