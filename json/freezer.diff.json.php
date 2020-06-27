@@ -1,5 +1,8 @@
 <?php
+error_reporting(error_reporting() & ~E_WARNING);
 header('Content-Type: application/json');
+
+require_once dirname(__FILE__) . '/../class/Freezer.php';
 
 function isoToUtf($arr)
 {
@@ -18,8 +21,6 @@ function isoToUtf($arr)
     return $output;
 }
 
-require_once dirname(__FILE__) . '/../class/Freezer.php';
-
 $config = $_GET['config'];
 $Freezer = new Freezer($config);
 $diff = $Freezer->load();
@@ -27,6 +28,7 @@ $diff = $Freezer->load();
 if (is_array($diff) && $Freezer->getEncoding() != 'UTF-8') {
     $diff = isoToUtf($diff);
 }
+
 $json = json_encode($diff);
 
 echo $json;

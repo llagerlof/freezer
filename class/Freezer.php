@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.9.2
+ * @version    0.10.0
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -40,13 +40,6 @@ class Freezer
      * @var array
      */
     private $last_result = null;
-
-    /**
-     * The last PDO error
-     *
-     * @var array
-     */
-    private $last_error = null;
 
     /**
      * The tables' metadata
@@ -84,6 +77,20 @@ class Freezer
     private $encoding = null;
 
     /**
+     * An array containing all errors
+     *
+     * @var array
+     */
+    private $errors = null;
+
+    /**
+     * An array containing all messages
+     *
+     * @var array
+     */
+    private $messages = null;
+
+    /**
      * Constructor
      *
      * @param string $config The database configuration. Must match the middle of the filename. eg: db config file='freezer.mydb.php' then $config='mydb'
@@ -91,7 +98,14 @@ class Freezer
     function __construct($config)
     {
         $this->loadConfig($config);
-        $this->PDO = new PDO($this->config['db']['statement'], $this->config['db']['username'], $this->config['db']['password']);
+
+        try {
+            $this->PDO = new PDO($this->config['db']['statement'], $this->config['db']['username'], $this->config['db']['password']);
+        } catch (Exception $e) {
+            $this->errors[] = 'Could not connect to database. Check configuration file.';
+
+            return false;
+        }
     }
 
     /**
@@ -113,16 +127,6 @@ class Freezer
     }
 
     /**
-     * Return the connection encoding set in configuration file. See file freezer.example.php
-     *
-     * @return string The database encoding
-     */
-    public function getEncoding()
-    {
-        return $this->encoding;
-    }
-
-    /**
      * Generic method to execute database queries
      *
      * @param string $sql The SELECT statement
@@ -131,14 +135,21 @@ class Freezer
      */
     private function query($sql)
     {
-        $ps = $this->PDO->prepare($sql);
+        if (isset($this->PDO) && !is_null($this->PDO)) {
+            $ps = $this->PDO->prepare($sql);
+        } else {
+            $this->errors[] = 'Could not execute a prepared statement. Database connection problem?';
+
+            return false;
+        }
+
         $this->last_query = $sql;
         $result = $ps->execute();
         if (!$result) {
-            $error_info = $ps->errorInfo();
-            $this->last_error = $error_info;
+            $error_message = $ps->errorInfo();
+            $this->errors[] = "Database query error: " . trim($error_message[2]);
 
-            throw new Exception($error_info[2]);
+            return false;
         }
         $this->last_result = $ps->fetchAll(PDO::FETCH_ASSOC);
 
@@ -153,9 +164,27 @@ class Freezer
     private function getTables()
     {
         $tables = $this->query('show tables');
+        if (!$tables) {
+            $this->errors[] = 'Could not execute: "SHOW TABLES"';
+
+            return false;
+        };
+
         foreach ($tables as $table) {
             $ini = parse_ini_string(str_replace(';', "\n", $this->config['db']['statement']));
+            if (!$ini) {
+                $this->errors[] = 'Could not parse database statement. Check the configuration file.';
+
+                return false;
+            }
+
             $table_structure = $this->query("desc " . $table['Tables_in_' . $this->dbname]);
+            if (!$table_structure) {
+                $this->errors[] = 'Could not execute DESC on table "' . $table['Tables_in_' . $this->dbname] . '"';
+
+                return false;
+            }
+
             $this->tables[$table['Tables_in_' . $this->dbname]] = $table_structure;
         }
 
@@ -202,21 +231,79 @@ class Freezer
     }
 
     /**
-     * Write a temporary file to store the last tables' ids
+     * Return the connection encoding set in configuration file. See file config/freezer.example.php
+     *
+     * @return string The database encoding
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Return all logged error messages
+     *
+     * @return array Error messages
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Return all logged messages
+     *
+     * @return array Messages
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * Return messages and errors to be sent as json on ajax request
+     *
+     * @return StdClass Messages
+     */
+    public function getResponse()
+    {
+        $response = new StdClass();
+        $response->messages = $this->messages;
+        $response->errors = $this->errors;
+
+        return $response;
+    }
+
+    /**
+     * Write a temporary file to store the last tables' IDs
      *
      * @return bool The number of bytes written to the temporary file
      */
     public function save()
     {
-        $this->getTables();
+        $tables = $this->getTables();
+        if (!$tables) {
+            $this->errors[] = 'Failed to retrieve tables list.';
+
+            return false;
+        }
         $table_last_ids = array();
-        foreach ($this->tables as $tablename => $tabledetail) {
+        foreach ($tables as $tablename => $tabledetail) {
             $last_record_id = $this->getLastRecordId($tablename);
             $this->tables[$tablename]['last_record_id'] = $last_record_id;
             $table_last_ids[$tablename] = $last_record_id;
         }
 
-        return file_put_contents($this->temp_file, serialize($table_last_ids));
+        $bytes_written = file_put_contents($this->temp_file, serialize($table_last_ids));
+        if (!$bytes_written) {
+            $this->errors[] = 'Could not write to temporary file.';
+
+            return false;
+        }
+
+        $this->messages[] = count($table_last_ids) . ' frozen tables. ' . $bytes_written . ' bytes written to temporary file. Add something to the database and click in [What is New].';
+
+        return $bytes_written;
     }
 
     /**
@@ -227,11 +314,29 @@ class Freezer
     public function load()
     {
         $previous_ids = unserialize(file_get_contents($this->temp_file));
-        $this->getTables();
+        if (!$previous_ids) {
+            $this->errors[] = 'Could not read from temporary file.';
+
+            return false;
+        }
+
+        $tables = $this->getTables();
+        if (!$tables) {
+            $this->errors[] = 'Failed to retrieve tables list.';
+
+            return false;
+        }
+
         foreach ($previous_ids as $tablename => $last_id) {
             $max_field = $this->getMaxField($tablename);
             $where = $last_id ? ' where ' . $max_field . ' > ' . $last_id : '';
             $table_current_data = $this->query('select * from ' . $tablename . $where);
+            if (!is_array($table_current_data)) {
+                $this->errors[] = 'Failed to select the last record from table "' . $tablename . '"';
+
+                return false;
+            }
+
             if (!empty($table_current_data)) {
                 $this->diff[$tablename] = $table_current_data;
             }

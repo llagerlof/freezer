@@ -10,11 +10,20 @@
                 max-width: 100%;
                 margin-left: 30px;
             }
+
             table {
                 width: 100%;
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
+            }
+
+            #messages {
+                color: green;
+            }
+
+            #errors {
+                color: red;
             }
         </style>
     </head>
@@ -24,7 +33,9 @@
         </select>
         <button id="freeze">Freeze</button>
         <button id="whatsnew">What is New</button>
-        <div id="feedback">
+        <div id="errors">
+        </div>
+        <div id="messages">
         </div>
         <div id="diff">
         </div>

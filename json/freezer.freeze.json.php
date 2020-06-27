@@ -1,11 +1,11 @@
 <?php
-header('Content-Type: application/json');
-
 require_once dirname(__FILE__) . '/../class/Freezer.php';
 
-$config = $_GET['config'];
+header('Content-Type: application/json');
 
+$config = $_GET['config'];
 $Freezer = new Freezer($config);
 $saved = $Freezer->save();
+$response = $Freezer->getResponse();
 
-echo json_encode($saved);
+echo json_encode($response);
