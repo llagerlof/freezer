@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 $configs = array();
 $files = scandir(dirname(__FILE__) . '/../config');
-$config_files = preg_grep('/^freezer\.[a-z0-9]+\.php$/', $files);
+$config_files = preg_grep('/^freezer\.[a-zA-Z0-9]+\.php$/', $files);
 $configs = array();
 
 if (count($config_files) > 1) {
@@ -12,7 +12,7 @@ if (count($config_files) > 1) {
 }
 
 foreach ($config_files as $file) {
-    preg_match('/freezer\.(.*?)\.php/', $file, $match);
+    preg_match('/^freezer\.(.*?)\.php$/', $file, $match);
     $configs[] = $match[1];
 }
 

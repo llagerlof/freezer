@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.10.0
+ * @version    0.10.1
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -178,14 +178,14 @@ class Freezer
                 return false;
             }
 
-            $table_structure = $this->query("desc " . $table['Tables_in_' . $this->dbname]);
+            $table_structure = $this->query("desc " . $table['Tables_in_' . strtolower($this->dbname)]);
             if (!$table_structure) {
-                $this->errors[] = 'Could not execute DESC on table "' . $table['Tables_in_' . $this->dbname] . '"';
+                $this->errors[] = 'Could not execute DESC on table "' . $table['Tables_in_' . strtolower($this->dbname)] . '"';
 
                 return false;
             }
 
-            $this->tables[$table['Tables_in_' . $this->dbname]] = $table_structure;
+            $this->tables[$table['Tables_in_' . strtolower($this->dbname)]] = $table_structure;
         }
 
         return $this->tables;
