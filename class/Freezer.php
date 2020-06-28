@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.10.1
+ * @version    0.10.2
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -60,7 +60,7 @@ class Freezer
      *
      * @var array
      */
-    private $tables_without_max_field = null;
+    private $tables_without_max_field = array();
 
     /**
      * The database name
@@ -290,8 +290,11 @@ class Freezer
         $table_last_ids = array();
         foreach ($tables as $tablename => $tabledetail) {
             $last_record_id = $this->getLastRecordId($tablename);
-            $this->tables[$tablename]['last_record_id'] = $last_record_id;
-            $table_last_ids[$tablename] = $last_record_id;
+
+            if (!in_array($tablename, $this->tables_without_max_field)) {
+                $this->tables[$tablename]['last_record_id'] = $last_record_id;
+                $table_last_ids[$tablename] = $last_record_id;
+            }
         }
 
         $bytes_written = file_put_contents($this->temp_file, serialize($table_last_ids));
@@ -329,7 +332,7 @@ class Freezer
 
         foreach ($previous_ids as $tablename => $last_id) {
             $max_field = $this->getMaxField($tablename);
-            $where = $last_id ? ' where ' . $max_field . ' > ' . $last_id : '';
+            $where = $last_id ? ' where ' . $max_field . ' > \'' . $last_id . '\'' : '';
             $table_current_data = $this->query('select * from ' . $tablename . $where);
             if (!is_array($table_current_data)) {
                 $this->errors[] = 'Failed to select the last record from table "' . $tablename . '"';
