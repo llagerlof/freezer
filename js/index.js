@@ -62,11 +62,12 @@ $(document).ready(function() {
                     $('#whatsnew').prop('disabled', false);
                     return;
                 }
-                var output = '<div class="container">';
+                var output = '<div class="container-table-diff">';
                 $.each(result, function(tablename, v) {
                     var loaded_headers = false;
                     output += '<h3>' + tablename + '</h3>';
-                    output += '<table style="border: 1px solid black;">';
+                    output += '<div>';
+                    output += '<table class="pure-table pure-table-bordered">';
                     $.each(this, function(i2, v2) {
                         if (!loaded_headers) {
                             output += '<thead><tr>';
@@ -87,6 +88,7 @@ $(document).ready(function() {
                         output += '</tr>';
                     });
                     output += '</table>';
+                    output += '</div>';
                 });
                 output += '</div>';
                 $('#diff').append(output);

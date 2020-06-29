@@ -1,0 +1,27 @@
+body {
+    margin: 40px;
+}
+
+table {
+    white-space: nowrap;
+}
+
+.container-table-diff > div {
+    overflow: auto;
+}
+
+.button-default {
+    border-radius: 5px;
+}
+
+.version {
+    font-size: xx-small;
+}
+
+#messages {
+    color: green;
+}
+
+#errors {
+    color: red;
+}
