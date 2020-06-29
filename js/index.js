@@ -5,7 +5,7 @@ $(document).ready(function() {
         url: 'json/freezer.combo.json.php',
         success: function(result) {
             $.each(result, function(i, config) {
-                $('#configs').append(new Option(config, config));
+                $('#configs').append(`<option value="${config}">${config}</option>`);
             });
         },
         error: function(result) {
@@ -36,19 +36,19 @@ $(document).ready(function() {
             success: function(result) {
                 if (result && Array.isArray(result.messages)) {
                     result.messages.forEach(function(v, i) {
-                        $('#messages').append('<p>&gt; ' + v + '</p>');
+                        $('#messages').append(`<p>&gt; ${v}</p>`);
                     });
                 }
                 if (result && Array.isArray(result.errors)) {
                     result.errors.forEach(function(v, i) {
-                        $('#errors').append('<p>&gt; ' + v + '</p>');
+                        $('#errors').append(`<p>&gt; ${v}</p>`);
                     });
                 }
                 loading(false);
             },
             error: function(result) {
                 console.log(result);
-                $('#errors').append('<p>Server error: ' + result.responseText + '</p>');
+                $('#errors').append(`<p>Server error: ${result.responseText}</p>`);
                 loading(false);
             }
         });
@@ -72,25 +72,21 @@ $(document).ready(function() {
                 var output = '<div class="container-table-diff">';
                 $.each(result, function(tablename, v) {
                     var loaded_headers = false;
-                    output += '<h3>' + tablename + '</h3>';
+                    output += `<h3>${tablename}</h3>`;
                     output += '<div>';
                     output += '<table class="pure-table pure-table-bordered">';
                     $.each(this, function(i2, v2) {
                         if (!loaded_headers) {
                             output += '<thead><tr>';
                             $.each(this, function(column, cell) {
-                                output += '<td>';
-                                output += column;
-                                output += '</td>';
+                                output += `<td>${column}</td>`;
                             });
                             output += '</tr></thead>';
                             loaded_headers = true;
                         }
                         output += '<tr>';
                         $.each(this, function(i3, cell) {
-                            output += '<td>';
-                            output += cell;
-                            output += '</td>';
+                            output += `<td>${cell}</td>`;
                         });
                         output += '</tr>';
                     });
@@ -103,7 +99,7 @@ $(document).ready(function() {
             },
             error: function(result) {
                 console.log(result);
-                $('#errors').append('<p>Server error: ' + result.responseText + '</p>');
+                $('#errors').append(`<p>Server error: ${result.responseText}</p>`);
                 loading(false);
             }
         });
