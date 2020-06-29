@@ -7,15 +7,19 @@
         <script src="js/index.js" type="text/javascript" charset="utf-8"></script>
         <link rel="stylesheet" href="css/base-min.css">
         <link rel="stylesheet" href="css/pure-min.css">
+        <link rel="stylesheet" href="css/loading-icon.css">
         <link rel="stylesheet" href="css/index.css">
     </head>
     <body>
-        <h1>Freezer <span class="version">0.11.1</span></h1>
+        <h1>Freezer <span class="version">0.12.0</span></h1>
         <form onsubmit="return false;" class="pure-form">
             <select name="configs" id="configs" class="pure-combo"></select>
             <button id="freeze" class="button-default pure-button pure-button-primary">Freeze</button>
             <button id="whatsnew" class="button-default pure-button pure-button-primary">What is New</button>
         </form>
+        <!-- loading icon -->
+        <div id="loading-icon" style="display:none" class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        <!-- end of loading icon -->
         <div id="errors">
         </div>
         <div id="messages">

@@ -13,11 +13,20 @@ $(document).ready(function() {
         }
     });
 
-    // Store on the server all last records ids.
-    $('#freeze').on('click', function(){
-        $('#freeze').prop('disabled', true);
-        $('#messages, #errors').html('');
-        $('#diff').html('');
+    function loading(show) {
+        if (show) {
+            $('#freeze, #whatsnew, #configs').prop('disabled', true);
+            $('.lds-ellipsis').css('display', 'inline-block');
+            $('#messages, #errors, #diff').html('');
+        } else {
+            $('.lds-ellipsis').css('display', 'none');
+            $('#freeze, #whatsnew, #configs').prop('disabled', false);
+        }
+    }
+
+    // Store on the server all last records' IDs.
+    $('#freeze').on('click', function() {
+        loading(true);
         $.ajax({
             dataType: 'json',
             url: 'json/freezer.freeze.json.php',
@@ -26,30 +35,28 @@ $(document).ready(function() {
             },
             success: function(result) {
                 if (result && Array.isArray(result.messages)) {
-                    result.messages.forEach(function(v, i){
+                    result.messages.forEach(function(v, i) {
                         $('#messages').append('<p>&gt; ' + v + '</p>');
                     });
                 }
                 if (result && Array.isArray(result.errors)) {
-                    result.errors.forEach(function(v, i){
+                    result.errors.forEach(function(v, i) {
                         $('#errors').append('<p>&gt; ' + v + '</p>');
                     });
                 }
-                $('#freeze').prop('disabled', false);
+                loading(false);
             },
             error: function(result) {
                 console.log(result);
                 $('#errors').append('<p>Server error: ' + result.responseText + '</p>');
-                $('#freeze').prop('disabled', false);
+                loading(false);
             }
         });
     });
 
     // Load all new records between the last freeze and now.
-    $('#whatsnew').on('click', function(){
-        $('#whatsnew').prop('disabled', true);
-        $('#messages, #errors').html('');
-        $('#diff').html('');
+    $('#whatsnew').on('click', function() {
+        loading(true);
         $.ajax({
             dataType: 'json',
             url: 'json/freezer.diff.json.php',
@@ -59,7 +66,7 @@ $(document).ready(function() {
             success: function(result) {
                 if (result == null || result.length == 0) {
                     $('#messages').append('No new records since last [Freeze].');
-                    $('#whatsnew').prop('disabled', false);
+                    loading(false);
                     return;
                 }
                 var output = '<div class="container-table-diff">';
@@ -92,12 +99,12 @@ $(document).ready(function() {
                 });
                 output += '</div>';
                 $('#diff').append(output);
-                $('#whatsnew').prop('disabled', false);
+                loading(false);
             },
             error: function(result) {
                 console.log(result);
                 $('#errors').append('<p>Server error: ' + result.responseText + '</p>');
-                $('#whatsnew').prop('disabled', false);
+                loading(false);
             }
         });
     });
