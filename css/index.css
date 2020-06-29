@@ -20,8 +20,10 @@ table {
 
 #messages {
     color: green;
+    margin-top: 25px;
 }
 
 #errors {
     color: red;
+    margin-top: 25px;
 }
