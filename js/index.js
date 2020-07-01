@@ -24,6 +24,19 @@ $(document).ready(function() {
         }
     }
 
+    function showMessages(result) {
+        if (result && Array.isArray(result.messages)) {
+            result.messages.forEach(function(v, i) {
+                $('#messages').append(`<p>&gt; ${v}</p>`);
+            });
+        }
+        if (result && Array.isArray(result.errors)) {
+            result.errors.forEach(function(v, i) {
+                $('#errors').append(`<p>&gt; ${v}</p>`);
+            });
+        }
+    }
+
     // Store on the server all last records' IDs.
     $('#freeze').on('click', function() {
         loading(true);
@@ -34,16 +47,7 @@ $(document).ready(function() {
                 'config': $('#configs').find(':selected').text()
             },
             success: function(result) {
-                if (result && Array.isArray(result.messages)) {
-                    result.messages.forEach(function(v, i) {
-                        $('#messages').append(`<p>&gt; ${v}</p>`);
-                    });
-                }
-                if (result && Array.isArray(result.errors)) {
-                    result.errors.forEach(function(v, i) {
-                        $('#errors').append(`<p>&gt; ${v}</p>`);
-                    });
-                }
+                showMessages(result);
                 loading(false);
             },
             error: function(result) {
@@ -64,13 +68,9 @@ $(document).ready(function() {
                 'config': $('#configs').find(':selected').text()
             },
             success: function(result) {
-                if (result == null || result.length == 0) {
-                    $('#messages').append('No new records since last [Freeze].');
-                    loading(false);
-                    return;
-                }
+                showMessages(result);
                 var output = '<div class="container-table-diff">';
-                $.each(result, function(tablename, v) {
+                $.each(result.diff, function(tablename, v) {
                     var loaded_headers = false;
                     output += `<h3>${tablename}</h3>`;
                     output += '<div>';

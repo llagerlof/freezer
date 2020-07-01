@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.14.0
+ * @version    0.15.0
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -13,6 +13,18 @@
  */
 class Freezer
 {
+    /**
+     * The constant that defines the action made when save() method is called
+     * @access public
+     */
+    const FREEZE = 'freeze';
+
+    /**
+     * The constant that defines the action made when load() method is called
+     * @access public
+     */
+    const DIFF = 'diff';
+
     /**
      * The PDO connection
      *
@@ -147,7 +159,7 @@ class Freezer
         $result = $ps->execute();
         if (!$result) {
             $error_message = $ps->errorInfo();
-            $this->errors[] = "Database query error: " . trim($error_message[2]);
+            $this->errors[] = 'Database query error: ' . trim($error_message[2]);
 
             return false;
         }
@@ -178,7 +190,7 @@ class Freezer
                 return false;
             }
 
-            $table_structure = $this->query("desc " . $table['Tables_in_' . strtolower($this->dbname)]);
+            $table_structure = $this->query('desc ' . $table['Tables_in_' . strtolower($this->dbname)]);
             if (!$table_structure) {
                 $this->errors[] = 'Could not execute DESC on table "' . $table['Tables_in_' . strtolower($this->dbname)] . '"';
 
@@ -231,6 +243,30 @@ class Freezer
     }
 
     /**
+     * Iterate a muldimensional array converting all ISO-8859-1 strings to UTF-8
+     *
+     * @param array $arr The array to be converted
+     *
+     * @return array The array converted
+     */
+    private function isoToUtf($arr)
+    {
+        foreach ($arr as $i => $element) {
+            if (is_array($element)) {
+                $output[$i] = isoToUtf($element);
+            } else {
+                if (is_string($element)) {
+                    $output[$i] = utf8_encode($element);
+                } else {
+                    $output[$i] = $element;
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * Return the connection encoding set in configuration file. See file config/freezer.example.php
      *
      * @return string The database encoding
@@ -265,11 +301,14 @@ class Freezer
      *
      * @return StdClass Messages
      */
-    public function getResponse()
+    public function getResponse($action)
     {
         $response = new StdClass();
         $response->messages = $this->messages;
         $response->errors = $this->errors;
+        if ($action == Freezer::DIFF) {
+            $response->diff = $this->diff;
+        }
 
         return $response;
     }
@@ -287,6 +326,7 @@ class Freezer
 
             return false;
         }
+
         $table_last_ids = array();
         foreach ($tables as $tablename => $tabledetail) {
             $last_record_id = $this->getLastRecordId($tablename);
@@ -318,7 +358,7 @@ class Freezer
     {
         $previous_ids = unserialize(file_get_contents($this->temp_file));
         if (!$previous_ids) {
-            $this->errors[] = 'Could not read from temporary file.';
+            $this->errors[] = 'Could not read from temporary file. Do you clicked in [Freeze] first?';
 
             return false;
         }
@@ -342,6 +382,14 @@ class Freezer
 
             if (!empty($table_current_data)) {
                 $this->diff[$tablename] = $table_current_data;
+            }
+        }
+
+        if (empty($this->diff)) {
+            $this->messages[] = 'No new records since last [Freeze].';
+        } else {
+            if (is_array($this->diff) && $this->getEncoding() != 'UTF-8') {
+                $this->diff = $this->isoToUtf($this->diff);
             }
         }
 
