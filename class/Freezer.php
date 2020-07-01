@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.15.0
+ * @version    0.15.1
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -253,7 +253,7 @@ class Freezer
     {
         foreach ($arr as $i => $element) {
             if (is_array($element)) {
-                $output[$i] = isoToUtf($element);
+                $output[$i] = $this->isoToUtf($element);
             } else {
                 if (is_string($element)) {
                     $output[$i] = utf8_encode($element);
