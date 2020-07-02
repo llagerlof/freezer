@@ -1,16 +1,18 @@
 # Freezer
-Freezer is a tool to help developers to track which database records are inserted by other programs.
+Freezer is a tool to help developers track which database records are inserted by other programs.
 
 ## Current version
 0.15.1
 
 ## Objective
-When developers need to work or understand databases of third-party applications (for example, *Moodle*, *HumHub*, *Elgg*, or any program that performs insert operations in the database) it is often useful to know exactly what is inserted when a certain operation in the third-party application is performed.
+When developers need to work with or understand databases of third-party applications that perform insert operations (e.g. *Moodle*, *HumHub*, *Elgg*), it is often useful to know what exactly is inserted in the database when a certain action is performed in the application.
 
-This tool makes much easier to spot this new records across the tables and to understand how the third-party application interacts with the database, and how relationships are made.
+This tool makes it much easier to spot these new records across all tables and to understand how the third-party application interacts with the database, and also how relationships are made.
+
+Currently only MySQL is supported.
 
 ## Installation
-1. You must have a web server with PHP and PDO extension enabled. And MySQL.
+1. You must have a web server with PHP. PDO extension must be enabled to access the third-party application's MySQL server.
 2. Clone the Freezer repository:
 
 ```
@@ -18,20 +20,20 @@ $ git clone https://github.com/llagerlof/freezer.git
 ```
 
 3. Copy the file `config/freezer.example.php` to `config/freezer.yourdatabase.php`
-4. Configure the `freezer.yourdatabase.php` (instructions inside)
-5. Go to `http://localhost/freezer` (or whatever URL is for your local web server)
+4. Edit `freezer.yourdatabase.php` and configure it accordingly (instructions inside)
+5. Go to `http://localhost/freezer` (or whatever is the URL for your local web server)
 
 **IMPORTANT**:
-- *Freezer is intended to use only on localhost connections. At current state it should not run on a multi-user environment or production. There isn't any security implemented.*
-- *This program only runs SELECT statements on configured databases.*
+- *Freezer is intended to be used only on localhost. At current state it should not run on a multi-user environment or in production, as there isn't any security implemented.*
+- *This program only performs `SELECT`, `DESC` and `SHOW TABLES` statements on configured databases.*
 
 ## How to use
-1. Open some third-party application (eg. *Moodle*) and go to the point where you want to start tracking the inserts (eg. **before** clicking on the SAVE button of some record).
-2. On Freezer, select `yourdatabase` in the combo box and click the **Freeze** button.
+1. Open any third-party application (e.g. *Moodle*) and get to the point where you want to start tracking the inserts (e.g. **before** clicking on the SAVE button of some record).
+2. On Freezer, select `yourdatabase` in the combo box and click on the **Freeze** button.
 
 ![Freezer launch screen](https://i.imgur.com/9VfVvHe.png)
 
-3. Do some insert operations in the third-party application (eg. clicking in the SAVE button).
-4. On Freezer, click the **What is New** button.
+3. Do some insert operations in the third-party application (e.g. clicking on the SAVE button).
+4. On Freezer, click on the **What is New** button.
 
 Freezer will show you which records were inserted in all database's tables between the **Freeze** and **What is New** commands.
