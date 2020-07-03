@@ -5,7 +5,7 @@ Freezer is a tool to help developers track which database records are inserted b
 0.16.0
 
 ## Objective
-When developers need to work with or understand databases of third-party applications that perform insert operations (e.g. *Moodle*, *HumHub*, *Elgg*), it is often useful to know what exactly is inserted in the database when a certain action is performed in the application.
+When developers need to work with or understand databases of third-party applications (e.g. *Moodle*, *HumHub*, *Elgg*), it is often useful to know what exactly is inserted in the database when a certain action is performed in the third-party application.
 
 This tool makes it much easier to spot these new records across all tables and to understand how the third-party application interacts with the database, and also how relationships are made.
 
@@ -24,8 +24,9 @@ $ git clone https://github.com/llagerlof/freezer.git
 5. Go to `http://localhost/freezer` (or whatever is the URL for your local web server)
 
 **IMPORTANT**:
-- *Freezer is intended to be used **only on localhost**. At current state it should not run on a multi-user environment or in production, as there isn't any authentication method to access this tool.*
-- *This program only performs `SELECT`, `DESC` and `SHOW TABLES` statements on configured databases.*
+- *Freezer is intended to access only **localhost databases** for research purposes, or at most databases accessed by a single person.*
+- *Don't put this tool in production environment as there isn't any authentication method to access it.*
+- *This application only performs `SELECT`, `DESC` and `SHOW TABLES` statements on configured databases.*
 
 ## How to use
 1. Open any third-party application (e.g. *Moodle*) and get to the point where you want to start tracking the inserts (e.g. **before** clicking on the SAVE button of some record).
