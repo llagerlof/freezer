@@ -2,7 +2,7 @@
 Freezer is a tool to help developers track which database records are inserted by other programs.
 
 ## Current version
-0.15.1
+0.16.0
 
 ## Objective
 When developers need to work with or understand databases of third-party applications that perform insert operations (e.g. *Moodle*, *HumHub*, *Elgg*), it is often useful to know what exactly is inserted in the database when a certain action is performed in the application.

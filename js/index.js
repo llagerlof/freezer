@@ -42,6 +42,7 @@ $(document).ready(function() {
         loading(true);
         $.ajax({
             dataType: 'json',
+            type : 'post',
             url: 'json/freezer.freeze.json.php',
             data: {
                 'config': $('#configs').find(':selected').text()
@@ -63,6 +64,7 @@ $(document).ready(function() {
         loading(true);
         $.ajax({
             dataType: 'json',
+            type : 'post',
             url: 'json/freezer.diff.json.php',
             data: {
                 'config': $('#configs').find(':selected').text()

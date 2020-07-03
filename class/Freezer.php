@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.15.1
+ * @version    0.16.0
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -109,7 +109,12 @@ class Freezer
      */
     function __construct($config)
     {
-        $this->loadConfig($config);
+        $config_loaded = $this->loadConfig($config);
+        if (!$config_loaded) {
+            $this->errors[] = 'The configuration file has a problem.';
+
+            return false;
+        }
 
         try {
             $this->PDO = new PDO($this->config['db']['statement'], $this->config['db']['username'], $this->config['db']['password']);
@@ -118,6 +123,8 @@ class Freezer
 
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -129,8 +136,30 @@ class Freezer
      */
     private function loadConfig($config)
     {
-        $this->config = require(dirname(__FILE__) . '/../config/freezer.' . $config . '.php');
+        $config_file = dirname(__FILE__) . '/../config/freezer.' . $config . '.php';
+
+        if (!file_exists($config_file)) {
+            $this->errors[] = 'Missing configuration file.';
+
+            return false;
+        }
+
+        $this->config = require($config_file);
+
+        if (!isset($this->config['db']['statement'])) {
+            $this->errors[] = 'Missing database statement in configuration file.';
+
+            return false;
+        }
+
         $ini_statement = parse_ini_string(str_replace(';', "\n", $this->config['db']['statement']));
+
+        if (!isset($ini_statement['dbname'])) {
+            $this->errors[] = 'Database name missing in statement string from configuration file.';
+
+            return false;
+        }
+
         $this->dbname = $ini_statement['dbname'];
         $this->temp_file = sys_get_temp_dir() . '/freezer.' . $this->dbname . '.saved.temp';
         $this->encoding = isset($this->config['encoding']) ? $this->config['encoding'] : 'UTF-8';
@@ -303,14 +332,14 @@ class Freezer
      */
     public function getResponse($action)
     {
-        $response = new StdClass();
-        $response->messages = $this->messages;
-        $response->errors = $this->errors;
+        $ResponseJson = new ResponseJson();
+        $ResponseJson->setMessages($this->messages);
+        $ResponseJson->setErrors($this->errors);
         if ($action == Freezer::DIFF) {
-            $response->diff = $this->diff;
+            $ResponseJson->setDiff($this->diff);
         }
 
-        return $response;
+        return $ResponseJson->getResponse($action);
     }
 
     /**
@@ -344,7 +373,7 @@ class Freezer
             return false;
         }
 
-        $this->messages[] = count($table_last_ids) . ' frozen tables. ' . $bytes_written . ' bytes written to temporary file. Add something to the database and click in [What is New].';
+        $this->messages[] = count($table_last_ids) . ' frozen tables. ' . $bytes_written . ' bytes written to temporary file. Add something to the database and click on [What is New].';
 
         return $bytes_written;
     }
