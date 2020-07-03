@@ -24,7 +24,7 @@ $ git clone https://github.com/llagerlof/freezer.git
 5. Go to `http://localhost/freezer` (or whatever is the URL for your local web server)
 
 **IMPORTANT**:
-- *Freezer is intended to be used only on localhost. At current state it should not run on a multi-user environment or in production, as there isn't any security implemented.*
+- *Freezer is intended to be used **only on localhost**. At current state it should not run on a multi-user environment or in production, as there isn't any authentication method to access this tool.*
 - *This program only performs `SELECT`, `DESC` and `SHOW TABLES` statements on configured databases.*
 
 ## How to use
