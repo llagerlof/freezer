@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.16.0
+ * @version    0.16.1
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -219,7 +219,7 @@ class Freezer
                 return false;
             }
 
-            $table_structure = $this->query('desc ' . $table['Tables_in_' . strtolower($this->dbname)]);
+            $table_structure = $this->query('desc `' . $table['Tables_in_' . strtolower($this->dbname)] . '`');
             if (!$table_structure) {
                 $this->errors[] = 'Could not execute DESC on table "' . $table['Tables_in_' . strtolower($this->dbname)] . '"';
 
@@ -266,7 +266,7 @@ class Freezer
     private function getLastRecordId($tablename)
     {
         $id_field = $this->getMaxField($tablename);
-        $last_record_id = !empty($id_field) ? $this->query('select max(' . $id_field . ') as last from ' . $tablename) : null;
+        $last_record_id = !empty($id_field) ? $this->query('select max(' . $id_field . ') as last from `' . $tablename . '`') : null;
 
         return !empty($last_record_id) ? $last_record_id[0]['last'] : null;
     }
@@ -402,7 +402,7 @@ class Freezer
         foreach ($previous_ids as $tablename => $last_id) {
             $max_field = $this->getMaxField($tablename);
             $where = $last_id ? ' where ' . $max_field . ' > \'' . $last_id . '\'' : '';
-            $table_current_data = $this->query('select * from ' . $tablename . $where);
+            $table_current_data = $this->query('select * from `' . $tablename . '`' . $where);
             if (!is_array($table_current_data)) {
                 $this->errors[] = 'Failed to select the last record from table "' . $tablename . '"';
 
