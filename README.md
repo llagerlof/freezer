@@ -11,6 +11,14 @@ This tool makes it much easier to spot these new records across all tables and t
 
 Currently only MySQL is supported.
 
+## Showcase
+
+In this use case I want to know which records are inserted in Moodle's database when an assignment is created.
+
+I chose Moodle for this demo specifically because that application's database is quite complex.
+
+![Freezer demo video](https://i.imgur.com/TgJOIfd.gif)
+
 ## Installation
 1. You must have a web server with PHP. PDO extension must be enabled to access the third-party application's MySQL server.
 2. Clone the Freezer repository:
@@ -31,9 +39,6 @@ $ git clone https://github.com/llagerlof/freezer.git
 ## How to use
 1. Open any third-party application (e.g. *Moodle*) and get to the point where you want to start tracking the inserts (e.g. **before** clicking on the SAVE button of some record).
 2. On Freezer, select `yourdatabase` in the combo box and click on the **Freeze** button.
-
-![Freezer launch screen](https://i.imgur.com/9VfVvHe.png)
-
 3. Do some insert operations in the third-party application (e.g. clicking on the SAVE button).
 4. On Freezer, click on the **What is New** button.
 
