@@ -13,8 +13,6 @@ Currently only MySQL/MariaDB is supported.
 
 The goal of this tool is to shorten the time that developers need to understand the structure of a given database identifying in which tables the third-party application, like [**Moodle**](https://moodle.org), [**HumHub**](https://www.humhub.com) or [**Elgg**](https://elgg.org) for instance, inserts new records depending on the action the application performed, so the developer can focus directly on the tables that primarily matter for that specific action.
 
-This tool makes it much easier to spot these tables and its new records across all tables and to understand how the third-party application interacts with the database, and also how relationships are made.
-
 Or maybe you just want to quickly know which tables are affected by some application's action.
 
 Freezer can connect to any MySQL/MariaDB database, not just "third-party applications' databases".
