@@ -5,7 +5,7 @@ It makes much easier to spot these tables and its new records, understand how th
 
 ## Latest version
 
-0.16.2
+0.17.0
 
 Currently only MySQL/MariaDB is supported.
 

@@ -5,7 +5,7 @@
  * Freezer is a tool to help developers to discover which database inserts are made by other programs.
  *
  * @package    Freezer
- * @version    0.16.2
+ * @version    0.17.0
  * @author     Lawrence Lagerlof <llagerlof@gmail.com>
  * @copyright  2020 Lawrence Lagerlof
  * @link       http://github.com/llagerlof/freezer
@@ -374,6 +374,9 @@ class Freezer
         }
 
         $this->messages[] = count($table_last_ids) . ' frozen tables. ' . $bytes_written . ' bytes written to temporary file. Add something to the database and click on [What is New].';
+        if (!empty($this->tables_without_max_field)) {
+            $this->messages[] = 'No auto increment or undefined max field: ' . implode(', ', $this->tables_without_max_field);
+        }
 
         return $bytes_written;
     }
